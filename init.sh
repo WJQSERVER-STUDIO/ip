@@ -6,4 +6,4 @@ fi
 
 /data/caddy/caddy run --config /data/caddy/config/Caddyfile
 
-/data/ipinfo/ip
+exec /data/ipinfo/ip

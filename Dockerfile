@@ -1,1 +1,2 @@
+FROM wjqserver/caddy:alpine
 

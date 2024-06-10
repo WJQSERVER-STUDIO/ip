@@ -85,7 +85,6 @@
             } catch (error) {
                 httpsFailureCount++;
                 console.error('HTTPS request failed, count: ', httpsFailureCount);
-                // 如果HTTPS失败小于最大次数, 重试HTTP
                 if (httpsFailureCount < MAX_HTTPS_FAILURES) {
                     try {
                         const response = await fetch(apiUrlHttp);

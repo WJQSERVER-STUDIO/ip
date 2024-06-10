@@ -35,21 +35,21 @@ type CountryRecord struct {
 func main() {
     var err error
     // 打开ASN数据库
-    asnDB, err = maxminddb.Open("asn.mmdb")
+    asnDB, err = maxminddb.Open("/data/ipinfo/db/asn.mmdb")
     if err != nil {
         log.Fatal("Error opening ASN database:", err)
     }
     defer asnDB.Close()
 
     // 打开国家数据库
-    countryDB, err = maxminddb.Open("country.mmdb")
+    countryDB, err = maxminddb.Open("/data/ipinfo/db/country.mmdb")
     if err != nil {
         log.Fatal("Error opening country database:", err)
     }
     defer countryDB.Close()
 
     // 打开或创建日志文件
-    logFile, err := os.OpenFile("access.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+    logFile, err := os.OpenFile("/data/ipinfo/log/access.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
     if err != nil {
         log.Fatalf("Error opening file: %v", err)
     }

@@ -122,11 +122,13 @@
                 }, {});
 
                 const infoHtml = `
-                    <strong>线路:</strong> ${data.fl}<br>
                     <strong>IP地址:</strong> ${data.ip}<br>
-                    <strong>数据中心:</strong> ${data.colo}<br>
+                    <strong>国家/地区:</strong> ${data.loc}<br>                    
+                    <strong>Cloudflare数据中心:</strong> ${data.colo}<br>
                     <strong>HTTP版本:</strong> ${data.http}<br>
-                    <strong>TLS版本:</strong> ${data.tls}
+                    <strong>TLS版本:</strong> ${data.tls}<br>
+                    <strong>User-Agent:</strong> ${data.uag}<br>
+                    <strong>线路:</strong> ${data.fl}<br>
                 `;
 
                 document.getElementById('connection-info').innerHTML = infoHtml;

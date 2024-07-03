@@ -16,7 +16,7 @@ jobs:
       - name: Build
         run: go build -o ip ./main.go
       - name: package  
-          run: sudo tar -czvf ip.tar.gz ./ip # 将可执行文件打包为 tar.gz
+        run: sudo tar -czvf ip.tar.gz ./ip # 将可执行文件打包为 tar.gz
       - name: Upload to GitHub Artifacts
         uses: actions/upload-artifact@v2
         with:

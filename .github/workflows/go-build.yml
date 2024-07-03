@@ -1,4 +1,5 @@
-name: IPinfo Build
+name: Build
+
 on:
   workflow_dispatch:
 

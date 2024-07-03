@@ -1,0 +1,23 @@
+name: IPinfo Build
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        - name: Set up Go
+          uses: actions/setup-go@v3
+        with:
+          go-version: 1.22
+      - name: Build
+        run: go build -o ip ./main.go
+      - name: package  
+          run: sudo tar -czvf ip.tar.gz ./ip # 将可执行文件打包为 tar.gz
+      - name: Upload to GitHub Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ip
+          path: ./ip.tar.gz

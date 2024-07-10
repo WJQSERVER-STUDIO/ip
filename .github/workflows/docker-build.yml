@@ -2,6 +2,9 @@ name: Build Docker
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - '([0-9]{2}w[0-9]{2}[a-zA-Z]?)'
 
 jobs:
   docker:
@@ -29,5 +32,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: | 
-            wjqserver/ip:1.0.0
+            wjqserver/ip:${{ github.event.release.tag_name }}
             wjqserver/ip:latest

@@ -3,9 +3,6 @@ name: Build
 on:
   workflow_dispatch:
 
-env:
-  version: 24w01b
-      
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,10 +25,10 @@ jobs:
         id: create_release
         uses: ncipollo/release-action@v1
         with:
-          name: $version
+          name: ${{ env.VERSION }}
           artifacts: ./ip.tar.gz, ./ip
           token: ${{ secrets.REPO_TOKEN }}
-          tag: $version
+          tag: ${{ env.VERSION }}
           allowUpdates: true
         env:
           export PATH: $PATH:/usr/local/go/bin

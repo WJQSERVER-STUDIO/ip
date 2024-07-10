@@ -94,6 +94,12 @@
             import header_realip
         }
     }
+    route /bilibili* {
+        reverse_proxy {
+            to 127.0.0.1:8080
+            import header_realip
+        }
+    }
 }
 
 import /data/caddy/config.d/*

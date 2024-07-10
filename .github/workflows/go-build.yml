@@ -21,3 +21,15 @@ jobs:
         with:
           name: ip
           path: ./ip.tar.gz
+      - name: 上传至Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          name: 24w01a
+          artifacts: ./ip.tar.gz, ./ip
+          body: Caddy2.8.4
+          token: ${{ secrets.REPO_TOKEN }}
+          tag: 24w01a
+          allowUpdates: true
+        env:
+          export PATH: $PATH:/usr/local/go/bin

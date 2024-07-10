@@ -2,9 +2,9 @@ name: Build Docker
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '([0-9]{2}w[0-9]{2}[a-zA-Z]?)'
+  release:
+    types:
+      - published
 
 jobs:
   docker:

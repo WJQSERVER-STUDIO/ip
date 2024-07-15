@@ -47,17 +47,6 @@ func main() {
     if err != nil {
         log.Fatalf("Error opening file: %v", err)
     }
-
-    
-          
-            
-    
-
-          
-          Expand Down
-    
-    
-  
     defer logFile.Close()
     // 创建一个日志记录器
     logger := log.New(logFile, "", 0)

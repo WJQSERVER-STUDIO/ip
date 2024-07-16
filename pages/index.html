@@ -30,7 +30,7 @@
 
 <body>
     <div class="container">
-        <!-- 1号块：私有API信息 -->
+        <!-- 1号块：自有API信息 -->
         <div class="card shadow-sm mb-4">
             <div class="card-header">自有 API 查询结果</div>
             <div class="card-body">
@@ -67,9 +67,6 @@
 
         async function fetchIPData() {
             const ip = getQueryParam('ip');
-            //const host = window.location.host;
-            //const apiUrlHttps = ip ? `https://${host}/ip-lookup?ip=${ip}` : `https://${host}/ip-lookup`;
-            //const apiUrlHttp = ip ? `http://${host}/ip-lookup?ip=${ip}` : `http://${host}/ip-lookup`;
             const protocolAndHost = window.location.protocol + '//' + window.location.host;
             const apiUrl = ip ? `${protocolAndHost}/ip-lookup?ip=${ip}` : `${protocolAndHost}/ip-lookup`;
 
@@ -85,39 +82,6 @@
                 console.error('Request failed.');
                 document.getElementById('result').innerHTML = '查询失败，请检查网络连接。';
             }
-
-            // 尝试使用HTTPS请求
-            /*try {
-                const response = await fetch(apiUrlHttps);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                isHttpsAvailable = true;
-                const data = await response.json();
-                updateResult(data);
-                console.log("HTTPS is available. No further checks needed.");
-            } catch (error) {
-                httpsFailureCount++;
-                console.error('HTTPS request failed, count: ', httpsFailureCount);
-                if (httpsFailureCount < MAX_HTTPS_FAILURES) {
-                    try {
-                        const response = await fetch(apiUrlHttp);
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        const data = await response.json();
-                        updateResult(data);
-                        console.log("HTTP fallback succeeded.");
-                    } catch (error) {
-                        console.error('HTTP request failed as well.');
-                        document.getElementById('result').innerHTML = '查询失败，请检查网络连接。';
-                    }
-                } else {
-                    console.log("HTTPS failed too many times. Stop further attempts.");
-                    document.getElementById('result').innerHTML = '查询失败，请检查网络连接。';
-                }
-            } */
-        }
 
         function updateResult(data) {
             const countryCode = data.country_code ? data.country_code.toLowerCase() : '';

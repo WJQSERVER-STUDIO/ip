@@ -113,9 +113,12 @@
                     return obj;
                 }, {});
 
+                const countryCode = data.loc && data.loc.split('.')[0];
+                const flagIcon = countryCode ? `<span class="flag-icon flag-icon-${countryCode}"></span>` : '';
+
                 const infoHtml = `
                     <strong>IP地址:</strong> ${data.ip}<br>
-                    <strong>国家/地区:</strong> ${data.loc}<br>                    
+                    <strong>国家/地区:</strong> ${data.loc} ${flagIcon}<br>                    
                     <strong>Cloudflare数据中心:</strong> ${data.colo}<br>
                     <strong>HTTP版本:</strong> ${data.http}<br>
                     <strong>TLS版本:</strong> ${data.tls}<br>

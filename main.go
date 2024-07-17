@@ -8,8 +8,8 @@ import (
     "os"
     "time"
 
-    "ipinfo/lookup"
-    "ipinfo/proxy"
+    "github.com/WJQSERVER-STUDIO/ip/lookup"
+    "github.com/WJQSERVER-STUDIO/ip/proxy"
 )
 
 var logger *log.Logger

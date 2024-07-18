@@ -82,7 +82,7 @@
                 console.error('Request failed.');
                 document.getElementById('result').innerHTML = '查询失败，请检查网络连接。';
             }
-
+        }
         function updateResult(data) {
             const countryCode = data.country_code ? data.country_code.toLowerCase() : '';
             const flagIcon = countryCode ? `<span class="flag-icon flag-icon-${countryCode}"></span>` : '';

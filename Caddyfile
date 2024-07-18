@@ -85,7 +85,8 @@
 :80 {
 	root * /data/www
     file_server
-    import log 80
+    import log ip
+    import cache 0s 300s
     import error_page  
     import encode
     route /ip* {

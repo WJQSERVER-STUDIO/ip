@@ -158,7 +158,7 @@
                 <strong>国家/地区全称:</strong> ${data.country_name || '未知'}<br>
                 <strong>User-Agent:</strong> ${data.user_agent || '未知'}
             `;
-                document.getElementById('localinfo').innerHTML = localinfo;
+                document.getElementById('localinfo').innerHTML = result;
             }
 
             async function fetchCloudflareTraceData() {
@@ -254,7 +254,7 @@
 
                     document.getElementById('ipapico-info').innerHTML = infoHtml;
                 } catch (error) {
-                    console.error('请求 Cloudflare 跟踪失败：', error);
+                    console.error('请求 IPAPI.CO 跟踪失败：', error);
                     document.getElementById('ipapico-info').innerHTML = '无法获取连接信息';
                 }
             }

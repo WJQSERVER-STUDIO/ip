@@ -1,10 +1,10 @@
-name: Build Docker
+name: 打包Docker镜像
 
 on:
   workflow_dispatch:
   push:
     tags:
-      - "*w*b"
+      - "*w*"
 
 jobs:
   docker:

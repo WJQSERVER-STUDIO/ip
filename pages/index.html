@@ -113,7 +113,7 @@
                     return obj;
                 }, {});
 
-                const countryCode = data.loc && data.loc.split('.')[0];
+                const countryCode = data.loc ? data.loc.toLowerCase() : '';
                 const flagIcon = countryCode ? `<span class="flag-icon flag-icon-${countryCode}"></span>` : '';
 
                 const infoHtml = `

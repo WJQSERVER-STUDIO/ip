@@ -86,15 +86,14 @@
 	root * /data/www
     file_server
     import log ip
-    import cache 0s 300s
     import error_page  
     import encode
+    header Cache-Control {no-cache}
     route /ip* {
         reverse_proxy {
             to 127.0.0.1:8080
             import header_realip
         }
-        import cache 0s 0s
         rate_limit {remote.ip} 100r/m 10000 429
     }
     route /bilibili* {
@@ -102,7 +101,6 @@
             to 127.0.0.1:8080
             import header_realip
         }
-        import cache 0s 0s
         rate_limit {remote.ip} 30r/m 10000 429
     }
 }

@@ -21,7 +21,7 @@
             time_format "02/Jan/2006:15:04:05 -0700"
         }
 	    output file /data/caddy/log/{args.0}/access.log {
-	        roll_size 10MB
+	        roll_size 5MB
 	        roll_keep 10
 	        roll_keep_for 24h
 	    }

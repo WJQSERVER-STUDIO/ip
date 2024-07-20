@@ -89,6 +89,9 @@
     import error_page  
     import encode
     header Cache-Control {no-cache}
+    route / {
+        rate_limit {remote.ip} 100r/m 10000 429
+    }
     route /ip* {
         reverse_proxy {
             to 127.0.0.1:8080

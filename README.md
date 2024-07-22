@@ -1,6 +1,6 @@
 # ip
 
-![GitHub Release](https://img.shields.io/github/v/release/WJQSERVER-STUDIO/ip)
+![GitHub Release](https://img.shields.io/github/v/release/WJQSERVER-STUDIO/ip?display_name=tag&style=flat)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/WJQSERVER-STUDIO/ip)
 ![pull](https://img.shields.io/docker/pulls/wjqserver/ip.svg)
 ![size](https://img.shields.io/docker/image-size/wjqserver/ip)

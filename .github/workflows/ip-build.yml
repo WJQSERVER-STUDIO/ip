@@ -1,4 +1,4 @@
-name: 编译主程序
+name: Build IP
 
 on:
   workflow_dispatch:
@@ -7,18 +7,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Load VERSION
+      - name: 导入仓库
+        uses: actions/checkout@v3
+      - name: 加载版本号
         run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
-      - name: Set up Go
+      - name: Go环境部署
         uses: actions/setup-go@v3
         with:
           go-version: 1.22.6
-      - name: Build
+      - name: 编译
         run: go build -o ip ./main.go
-      - name: Package
+      - name: 打包
         run: sudo tar -czvf ip.tar.gz ./ip # 将可执行文件打包为 tar.gz
-      - name: Upload to GitHub Artifacts
+      - name: 上传至Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: ip

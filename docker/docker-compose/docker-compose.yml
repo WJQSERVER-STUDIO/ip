@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+    ip:
+        image: 'wjqserver/ip:24w08a'
+        restart: always
+        volumes:
+            - './ipinfo/log/run:/data/ipinfo/log'
+            - './ipinfo/log/caddy:/data/caddy/log'
+            - './ipinfo/db:/data/ipinfo/db'
+         ports:
+            - '7219:80'

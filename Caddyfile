@@ -72,16 +72,6 @@
     }    
 }
 
-(route_nocache) {
-    route {args.0} {
-        rate_limit {remote.ip} {args.1}r/m 10000 429
-        cache {
-            stale 0s
-            ttl 0s
-        }
-    }
-}
-
 :80 {
 	root * /data/www
     file_server

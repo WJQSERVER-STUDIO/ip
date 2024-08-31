@@ -87,7 +87,7 @@
             to 127.0.0.1:8080
             import header_realip
         }
-        rate_limit {remote.ip} 100r/m 10000 429
+        rate_limit {remote.ip} 60r/m 10000 429
     }
     route /bilibili* {
         reverse_proxy {

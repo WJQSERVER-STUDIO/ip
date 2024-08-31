@@ -85,16 +85,20 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 	ipStr := r.URL.Query().Get("ip")
 	if ipStr == "" {
 		// 尝试从X-Forwarded-For头部取得IP
-		fwdIP := r.Header.Get("X-Forwarded-For")
-		if fwdIP == "" {
-			fwdIP = r.Header.Get("X-Real-IP")
+		ipStr = r.Header.Get("X-Forwarded-For")
+		if ipStr == "" {
+			// 尝试从X-Real-IP头部取得IP
+			ipStr = r.Header.Get("X-Real-IP")
+			if ipStr == "" {
+				// 如果两个头部都没有，则从连接中获取IP
+				var err error
+				ipStr, _, err = net.SplitHostPort(r.RemoteAddr)
+				if err != nil {
+					http.Error(w, "Failed to resolve IP address", http.StatusInternalServerError)
+					return
+				}
+			}
 		}
-		// 如果两个头部都没有，则从连接中获取IP
-		if fwdIP == "" {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
-			fwdIP = ip
-		}
-		ipStr = fwdIP
 	}
 
 	ip := net.ParseIP(ipStr)
@@ -143,5 +147,7 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(responseData)
+	if err := json.NewEncoder(w).Encode(responseData); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }

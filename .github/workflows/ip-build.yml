@@ -20,7 +20,7 @@ jobs:
       - name: 打包
         run: sudo tar -czvf ip.tar.gz ./ip # 将可执行文件打包为 tar.gz
       - name: 上传至Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ip
           path: ./ip.tar.gz

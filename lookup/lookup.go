@@ -83,21 +83,24 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 尝试从查询参数获取IP
 	ipStr := r.URL.Query().Get("ip")
+
+	// 尝试从X-Forwarded-For头部取得IP
 	if ipStr == "" {
-		// 尝试从X-Forwarded-For头部取得IP
 		ipStr = r.Header.Get("X-Forwarded-For")
-		if ipStr == "" {
-			// 尝试从X-Real-IP头部取得IP
-			ipStr = r.Header.Get("X-Real-IP")
-			if ipStr == "" {
-				// 如果两个头部都没有，则从连接中获取IP
-				var err error
-				ipStr, _, err = net.SplitHostPort(r.RemoteAddr)
-				if err != nil {
-					http.Error(w, "Failed to resolve IP address", http.StatusInternalServerError)
-					return
-				}
-			}
+	}
+
+	// 尝试从X-Real-IP头部取得IP
+	if ipStr == "" {
+		ipStr = r.Header.Get("X-Real-IP")
+	}
+
+	// 如果两个头部都没有，则从连接中获取IP
+	if ipStr == "" {
+		var err error
+		ipStr, _, err = net.SplitHostPort(r.RemoteAddr)
+		if err != nil {
+			http.Error(w, "Failed to resolve IP address", http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -109,16 +112,14 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// 查询ASN记录
 	var asn ASNRecord
-	err := asnDB.Lookup(ip, &asn)
-	if err != nil {
+	if err := asnDB.Lookup(ip, &asn); err != nil {
 		http.Error(w, fmt.Sprintf("ASN Lookup failed: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	// 查询国家记录
 	var country CountryRecord
-	err = countryDB.Lookup(ip, &country)
-	if err != nil {
+	if err := countryDB.Lookup(ip, &country); err != nil {
 		http.Error(w, fmt.Sprintf("Country Lookup failed: %v", err), http.StatusInternalServerError)
 		return
 	}

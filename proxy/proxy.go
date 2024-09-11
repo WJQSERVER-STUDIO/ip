@@ -10,25 +10,17 @@ import (
 func BilibiliHandler(w http.ResponseWriter, r *http.Request) {
 	// 设置CORS头部允许跨站请求
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	//设置UA
 	w.Header().Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
 
 	// 从请求中获取ip参数
-	params, err := url.ParseQuery(r.URL.RawQuery)
-	if err != nil {
-		http.Error(w, "Invalid query parameters", http.StatusBadRequest)
+	ip := r.URL.Query().Get("ip")
+	if ip == "" {
+		http.Error(w, "Missing ip parameter", http.StatusBadRequest)
 		return
 	}
-	ip := params.Get("ip")
 
-	// 定义源API的URL
-	apiURL := "https://api.live.bilibili.com/ip_service/v1/ip_service/get_ip_addr"
-
-	// 如果ip参数存在，将其添加到API URL
-	if ip != "" {
-		apiURL += "?ip=" + url.QueryEscape(ip)
-	}
+	// 定义源API的URL并添加ip参数
+	apiURL := "https://api.live.bilibili.com/ip_service/v1/ip_service/get_ip_addr?ip=" + url.QueryEscape(ip)
 
 	// 向源API发送请求
 	resp, err := http.Get(apiURL)

@@ -14,7 +14,7 @@ jobs:
       - name: Go环境部署
         uses: actions/setup-go@v3
         with:
-          go-version: 1.23.0
+          go-version: 1.23.1
       - name: 编译
         run: go build -o ip ./main.go
       - name: 打包

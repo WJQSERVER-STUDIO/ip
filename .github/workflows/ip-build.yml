@@ -2,6 +2,11 @@ name: Build IP
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'VERSION'    
 
 jobs:
   build:

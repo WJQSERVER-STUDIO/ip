@@ -69,6 +69,13 @@ func GetIPHandler(w http.ResponseWriter, r *http.Request) {
 		fwdIP = ip.IP.String()
 	}
 
+	// 验证 IP 地址格式
+	if net.ParseIP(fwdIP) == nil {
+		http.Error(w, "Invalid IP address", http.StatusBadRequest)
+		log.Printf("Invalid IP address: %s", fwdIP)
+		return
+	}
+
 	// 直接返回IP地址，不使用JSON格式化
 	fmt.Fprintf(w, fwdIP)
 }

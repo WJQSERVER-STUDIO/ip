@@ -32,7 +32,7 @@ func main() {
 	}))
 	http.HandleFunc("/ip-lookup", LogRequestWrapper(lookup.IPLookupHandler))
 	http.HandleFunc("/ip", LogRequestWrapper(lookup.GetIPHandler))
-	http.HandleFunc("/bilibili", LogRequestWrapper(proxy.BilibiliHandler))
+	http.HandleFunc("/bilibili", LogRequestWrapper(proxy.BilibiliHandlerWithChromeTLS))
 
 	log.Println("Server running on http://localhost:8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {

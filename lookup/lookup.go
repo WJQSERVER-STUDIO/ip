@@ -80,7 +80,7 @@ func GetIPHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if validIP {
-		fmt.Fprintf(w, fwdIP)
+		fmt.Fprintf(w, (fwdIP))
 	} else {
 		http.Error(w, "	Invalid IP address", http.StatusBadRequest)
 	}

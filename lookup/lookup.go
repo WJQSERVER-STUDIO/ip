@@ -3,6 +3,7 @@ package lookup
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"log"
 	"net"
 	"net/http"
@@ -70,21 +71,13 @@ func GetIPHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 验证 IP 地址格式
-	var validIP bool
 	if net.ParseIP(fwdIP) == nil {
 		http.Error(w, "Invalid IP address", http.StatusBadRequest)
 		log.Printf("Invalid IP address: %s", fwdIP)
 		return
-	} else {
-		validIP = true
 	}
-
-	if validIP {
-		fmt.Fprintf(w, (fwdIP))
-	} else {
-		http.Error(w, "	Invalid IP address", http.StatusBadRequest)
-	}
-
+	// 返回IP地址
+	fmt.Fprintf(w, html.EscapeString(fwdIP))
 }
 
 // IPLookupHandler IP查询的处理函数

@@ -70,14 +70,21 @@ func GetIPHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 验证 IP 地址格式
+	var validIP bool
 	if net.ParseIP(fwdIP) == nil {
 		http.Error(w, "Invalid IP address", http.StatusBadRequest)
 		log.Printf("Invalid IP address: %s", fwdIP)
 		return
+	} else {
+		validIP = true
 	}
 
-	// 直接返回IP地址，不使用JSON格式化
-	fmt.Fprintf(w, fwdIP)
+	if validIP {
+		fmt.Fprintf(w, fwdIP)
+	} else {
+		http.Error(w, "	Invalid IP address", http.StatusBadRequest)
+	}
+
 }
 
 // IPLookupHandler IP查询的处理函数

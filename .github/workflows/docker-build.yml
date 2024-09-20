@@ -3,8 +3,10 @@ name: 打包Docker镜像
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "*"
+    branches:
+      - 'main'
+    paths:
+      - 'VERSION'
 
 jobs:
   docker:
@@ -27,6 +29,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+          
+      - name: Waiting for compilation
+        run: sleep 180s  
 
       - name: 构建镜像
         uses: docker/build-push-action@v5

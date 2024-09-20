@@ -35,7 +35,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           artifacts: ./ip.tar.gz, ./ip
-          token: ${{ secrets.REPO_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.VERSION }}
           allowUpdates: true
         env:

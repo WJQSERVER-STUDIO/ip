@@ -14,7 +14,7 @@ import (
 
 var logger *log.Logger
 
-func main() {
+func init() {
 	// 初始化日志文件
 	logFile, err := os.OpenFile("/data/ipinfo/log/access.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -25,7 +25,9 @@ func main() {
 
 	// 初始化数据库
 	lookup.Init()
+}
 
+func main() {
 	// 设置HTTP路由处理器并启动服务器
 	http.HandleFunc("/", LogRequestWrapper(func(w http.ResponseWriter, r *http.Request) {
 		// 其他处理逻辑...
@@ -34,7 +36,7 @@ func main() {
 	http.HandleFunc("/ip", LogRequestWrapper(lookup.GetIPHandler))
 	http.HandleFunc("/bilibili", LogRequestWrapper(proxy.BilibiliHandlerWithChromeTLS))
 
-	log.Println("Server running on http://localhost:8080")
+	log.Println("Server running on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("Error starting server: %v", err)
 	}

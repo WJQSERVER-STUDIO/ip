@@ -22,6 +22,8 @@ jobs:
           go-version: 1.23.1
       - name: 编译
         run: go build -o ip ./main.go
+      - name: 测试
+        run: go test
       - name: 打包
         run: sudo tar -czvf ip.tar.gz ./ip # 将可执行文件打包为 tar.gz
       - name: 上传至Artifacts
@@ -35,7 +37,7 @@ jobs:
         with:
           name: ${{ env.VERSION }}
           artifacts: ./ip.tar.gz, ./ip
-          token: ${{ secrets.REPO_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ env.VERSION }}
           allowUpdates: true
         env:

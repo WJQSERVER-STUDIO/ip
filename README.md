@@ -5,6 +5,8 @@
 ![pull](https://img.shields.io/docker/pulls/wjqserver/ip.svg)
 ![size](https://img.shields.io/docker/image-size/wjqserver/ip)
 
+用于获取IP相关信息的API程序
+
 ## Demo
 
 [演示站](https://ip.1888866.xyz)

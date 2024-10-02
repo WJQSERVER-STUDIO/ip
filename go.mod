@@ -1,6 +1,6 @@
 module github.com/WJQSERVER-STUDIO/ip
 
-go 1.23.1
+go 1.23.2
 
 require (
 	github.com/oschwald/maxminddb-golang v1.13.1

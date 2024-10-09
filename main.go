@@ -9,12 +9,27 @@ import (
 	"github.com/WJQSERVER-STUDIO/ip/proxy"
 )
 
+var logw = logger.Logw
+var LogFilePath = "/data/ip/log/access.log"
+var MaxLogSize = 1024 * 1024 * 5 // 10MB
+
+func setupLogger() {
+	// 初始化日志模块
+	var err error
+	err = logger.Init(LogFilePath, MaxLogSize) // 传递日志文件路径
+	if err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
+	logw("Logger initialized")
+}
+
 func init() {
 	// 初始化日志记录器，传入日志文件路径
-	logger.Init("/data/ip/log/access.log")
+	setupLogger()
 
 	// 初始化数据库
 	lookup.Init()
+	logw("Database initialized")
 }
 
 func main() {
@@ -36,7 +51,7 @@ func main() {
 // LogRequestWrapper 包装日志记录功能
 func LogRequestWrapper(handler func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		logger.LogRequest(r)
+		logger.LogHTTP(r)
 		handler(w, r)
 	}
 }

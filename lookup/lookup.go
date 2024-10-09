@@ -35,14 +35,14 @@ type CountryRecord struct {
 func Init() {
 	var err error
 	// 打开ASN数据库
-	asnDB, err = maxminddb.Open("/data/ipinfo/db/asn.mmdb")
+	asnDB, err = maxminddb.Open("/data/ip/db/asn.mmdb")
 	if err != nil {
 		log.Fatal("DB not exist Or error: ", err)
 		log.Fatal("Error opening ASN database:", err)
 	}
 
 	// 打开国家数据库
-	countryDB, err = maxminddb.Open("/data/ipinfo/db/country.mmdb")
+	countryDB, err = maxminddb.Open("/data/ip/db/country.mmdb")
 	if err != nil {
 		log.Fatal("DB not exist Or error: ", err)
 		log.Fatal("Error opening country database:", err)

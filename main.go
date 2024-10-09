@@ -11,7 +11,7 @@ import (
 
 func init() {
 	// 初始化日志记录器，传入日志文件路径
-	logger.Init("/data/ipinfo/log/access.log")
+	logger.Init("/data/ip/log/access.log")
 
 	// 初始化数据库
 	lookup.Init()

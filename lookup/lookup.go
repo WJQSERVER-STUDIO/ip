@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	asnDB     *maxminddb.Reader
-	countryDB *maxminddb.Reader
+	asnDB          *maxminddb.Reader
+	countryDB      *maxminddb.Reader
+	ASNDB_Path     = "/data/ip/db/asn.mmdb"
+	CountryDB_Path = "/data/ip/db/country.mmdb"
 )
 
 // ASNRecord 保存ASN数据库的查询结果
@@ -31,85 +33,59 @@ type CountryRecord struct {
 	CountryName   string `maxminddb:"country_name"`
 }
 
+func openDB(db **maxminddb.Reader, path string) {
+	var err error
+	*db, err = maxminddb.Open(path)
+	if err != nil {
+		log.Fatalf("Error opening database at %s: %v", path, err)
+	}
+}
+
 // Init 初始化日志文件和数据库
 func Init() {
-	var err error
-	// 打开ASN数据库
-	asnDB, err = maxminddb.Open("/data/ip/db/asn.mmdb")
-	if err != nil {
-		log.Fatal("DB not exist Or error: ", err)
-		log.Fatal("Error opening ASN database:", err)
-	}
-
-	// 打开国家数据库
-	countryDB, err = maxminddb.Open("/data/ip/db/country.mmdb")
-	if err != nil {
-		log.Fatal("DB not exist Or error: ", err)
-		log.Fatal("Error opening country database:", err)
-	}
+	openDB(&asnDB, ASNDB_Path)
+	openDB(&countryDB, CountryDB_Path)
 }
 
 // GetIPHandler 获取IP地址的处理函数
 func GetIPHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	fwdIP := getForwardedIP(r)
 
-	// 尝试从X-Forwarded-For头部取得IP
-	fwdIP := r.Header.Get("X-Forwarded-For")
-	if fwdIP == "" {
-		// 尝试从X-Real-IP头部取得IP
-		fwdIP = r.Header.Get("X-Real-IP")
-	}
-
-	// 如果两个头部都没有，则从连接中获取IP
-	if fwdIP == "" {
-		ip, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
-		if err != nil {
-			http.Error(w, "Failed to resolve IP address", http.StatusInternalServerError)
-			return
-		}
-		fwdIP = ip.IP.String()
-	}
-
-	// 验证 IP 地址格式
-	if net.ParseIP(fwdIP) == nil {
+	if fwdIP == "" || net.ParseIP(fwdIP) == nil {
 		http.Error(w, "Invalid IP address", http.StatusBadRequest)
 		log.Printf("Invalid IP address: %s", fwdIP)
 		return
 	}
-	// 返回IP地址
+
 	fmt.Fprintf(w, html.EscapeString(fwdIP))
+}
+
+// getForwardedIP 从请求中获取转发的IP地址
+func getForwardedIP(r *http.Request) string {
+	if fwdIP := r.Header.Get("X-Forwarded-For"); fwdIP != "" {
+		return fwdIP
+	}
+	return r.Header.Get("X-Real-IP")
+}
+
+// getIPFromRequest 从请求中获取IP地址
+func getIPFromRequest(r *http.Request) string {
+	ipStr := r.URL.Query().Get("ip")
+	if ipStr == "" {
+		ipStr = getForwardedIP(r)
+	}
+	if ipStr == "" {
+		ipStr, _, _ = net.SplitHostPort(r.RemoteAddr)
+	}
+	return ipStr
 }
 
 // IPLookupHandler IP查询的处理函数
 func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
-	// 允许跨站请求
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-
-	// 从请求中获取User-Agent头部，即浏览器信息
 	userAgent := r.Header.Get("User-Agent")
-
-	// 尝试从查询参数获取IP
-	ipStr := r.URL.Query().Get("ip")
-
-	// 尝试从X-Forwarded-For头部取得IP
-	if ipStr == "" {
-		ipStr = r.Header.Get("X-Forwarded-For")
-	}
-
-	// 尝试从X-Real-IP头部取得IP
-	if ipStr == "" {
-		ipStr = r.Header.Get("X-Real-IP")
-	}
-
-	// 如果两个头部都没有，则从连接中获取IP
-	if ipStr == "" {
-		var err error
-		ipStr, _, err = net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			http.Error(w, "Failed to resolve IP address", http.StatusInternalServerError)
-			return
-		}
-	}
+	ipStr := getIPFromRequest(r)
 
 	ip := net.ParseIP(ipStr)
 	if ip == nil {
@@ -117,22 +93,30 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 查询ASN记录
+	responseData, err := getIPInfo(ip, userAgent)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(responseData); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+}
+
+func getIPInfo(ip net.IP, userAgent string) (interface{}, error) {
 	var asn ASNRecord
 	if err := asnDB.Lookup(ip, &asn); err != nil {
-		http.Error(w, fmt.Sprintf("ASN Lookup failed: %v", err), http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("ASN Lookup failed: %v", err)
 	}
 
-	// 查询国家记录
 	var country CountryRecord
 	if err := countryDB.Lookup(ip, &country); err != nil {
-		http.Error(w, fmt.Sprintf("Country Lookup failed: %v", err), http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("Country Lookup failed: %v", err)
 	}
 
-	// 整理响应数据
-	responseData := struct {
+	return struct {
 		IP            string `json:"ip"`
 		ASN           string `json:"asn"`
 		Domain        string `json:"domain"`
@@ -143,7 +127,7 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 		CountryName   string `json:"country_name"`
 		UserAgent     string `json:"user_agent"`
 	}{
-		IP:            ipStr,
+		IP:            ip.String(),
 		ASN:           asn.ASN,
 		Domain:        asn.Domain,
 		ISP:           asn.Name,
@@ -152,10 +136,5 @@ func IPLookupHandler(w http.ResponseWriter, r *http.Request) {
 		CountryCode:   country.Country,
 		CountryName:   country.CountryName,
 		UserAgent:     userAgent,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(responseData); err != nil {
-		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-	}
+	}, nil
 }

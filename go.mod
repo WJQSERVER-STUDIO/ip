@@ -3,7 +3,7 @@ module github.com/WJQSERVER-STUDIO/ip
 go 1.23.2
 
 require (
-	github.com/imroc/req/v3 v3.47.0
+	github.com/imroc/req/v3 v3.48.0
 	github.com/oschwald/maxminddb-golang v1.13.1
 	gopkg.in/yaml.v3 v3.0.1
 )

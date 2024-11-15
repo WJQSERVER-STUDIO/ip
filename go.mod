@@ -1,6 +1,6 @@
 module github.com/WJQSERVER-STUDIO/ip
 
-go 1.23.2
+go 1.23.3
 
 require (
 	github.com/imroc/req/v3 v3.48.0

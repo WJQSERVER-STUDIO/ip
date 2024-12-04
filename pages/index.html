@@ -127,7 +127,7 @@
             async function fetchIPData() {
                 const ip = getQueryParam('ip');
                 const protocolAndHost = window.location.protocol + '//' + window.location.host;
-                const apiUrl = ip ? `${protocolAndHost}/ip-lookup?ip=${ip}` : `${protocolAndHost}/ip-lookup`;
+                const apiUrl = ip ? `${protocolAndHost}/ip-lookup?ip=${ip}` : `${protocolAndHost}/api/ip-lookup`;
 
                 try {
                     const response = await fetch(apiUrl);
@@ -201,7 +201,7 @@
                     const dataIP = await responseIP.json();
                     const ip = dataIP.data.ip;
                     const protocolAndHost = window.location.protocol + '//' + window.location.host;
-                    const apiUrl = `${protocolAndHost}/bilibili?ip=${ip}`;
+                    const apiUrl = `${protocolAndHost}/api/bilibili?ip=${ip}`;
                     const response = await fetch(apiUrl);
                     if (!response.ok) {
                         throw new Error('Network response was not ok');

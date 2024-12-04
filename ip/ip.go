@@ -87,3 +87,27 @@ func IPHandler(c *gin.Context) {
 	// 响应json
 	c.JSON(200, response)
 }
+
+func IPPureHandler(c *gin.Context) {
+	var ip string
+	// 优先获取X-Forwarded-For，其次是X-Real-IP,最后是c.clientIP()
+	fwdIP := c.GetHeader("X-Forwarded-For")
+	realIP := c.GetHeader("X-Real-IP")
+	if fwdIP != "" {
+		ip = fwdIP
+	} else if realIP != "" {
+		ip = realIP
+	} else {
+		ip = c.ClientIP()
+	}
+
+	// 预处理IP地址，转为net.IP类型
+	netIP := net.ParseIP(ip)
+	if netIP == nil {
+		logWarning("Invalid IP address: ", ip)
+		c.JSON(400, gin.H{"error": "Invalid IP address"})
+		return
+	}
+	// 纯IP响应,非json格式
+	c.String(200, ip)
+}

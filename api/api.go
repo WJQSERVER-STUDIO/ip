@@ -3,6 +3,7 @@ package api
 import (
 	"ip/bilibili"
 	"ip/config"
+	"ip/ip"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,10 +17,10 @@ func InitHandleRouter(cfg *config.Config, router *gin.Engine) {
 			})
 		})
 		apiRouter.Any("/ip-lookup", func(c *gin.Context) {
-
+			ip.IPHandler(c)
 		})
 		apiRouter.Any("/ip", func(c *gin.Context) {
-
+			ip.IPPureHandler(c)
 		})
 		apiRouter.Any("/bilibili", func(c *gin.Context) {
 			bilibili.Bilibili(c)

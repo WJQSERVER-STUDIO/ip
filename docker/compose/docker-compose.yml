@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+    ip:
+        image: 'wjqserver/ip:latest'
+        restart: always
+        volumes:
+            - './ip/log/run:/data/ip/log'
+            - './ip/log/caddy:/data/caddy/log'
+            - './ip/db:/data/ip/db'
+        ports:
+            - '7763:80'

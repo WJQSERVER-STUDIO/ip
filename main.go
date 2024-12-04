@@ -1,57 +1,84 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/WJQSERVER-STUDIO/ip/logger"
-	"github.com/WJQSERVER-STUDIO/ip/lookup"
-	"github.com/WJQSERVER-STUDIO/ip/proxy"
+	"ip/api"
+	"ip/config"
+	"ip/db"
+	"ip/logger"
+
+	"github.com/gin-gonic/gin"
 )
 
-var logw = logger.Logw
-var LogFilePath = "/data/ip/log/access.log"
-var MaxLogSize = 1024 * 1024 * 5 // 10MB
+var (
+	cfg        *config.Config
+	configfile = "/data/go/config/config.toml"
+	router     *gin.Engine
+)
+
+// 日志模块
+var (
+	logw       = logger.Logw
+	logInfo    = logger.LogInfo
+	logWarning = logger.LogWarning
+	logError   = logger.LogError
+)
+
+func ReadFlag() {
+	cfgfile := flag.String("cfg", configfile, "config file path")
+	flag.Parse()
+	configfile = *cfgfile
+}
+
+func loadConfig() {
+	var err error
+	// 初始化配置
+	cfg, err = config.LoadConfig(configfile)
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+	fmt.Printf("Loaded config: %v\n", cfg)
+}
 
 func setupLogger() {
 	// 初始化日志模块
 	var err error
-	err = logger.Init(LogFilePath, MaxLogSize) // 传递日志文件路径
+	err = logger.Init(cfg.Log.LogFilePath, cfg.Log.MaxLogSize) // 传递日志文件路径
 	if err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)
 	}
 	logw("Logger initialized")
+	logw("Init Completed")
+}
+
+func setupDB() {
+	db.DBinit(cfg)
+}
+
+func setupApi(cfg *config.Config, router *gin.Engine) {
+	api.InitHandleRouter(cfg, router)
 }
 
 func init() {
-	// 初始化日志记录器，传入日志文件路径
+	ReadFlag()
+	loadConfig()
 	setupLogger()
+	setupDB()
+	setupApi(cfg, router)
 
-	// 初始化数据库
-	lookup.Init()
-	logw("Database initialized")
+	gin.SetMode(gin.ReleaseMode)
+	router = gin.Default()
+	router.UseH2C = false
+	setupApi(cfg, router)
 }
 
 func main() {
-	defer logger.Close() // 确保在程序结束时关闭日志文件
-	// 设置HTTP路由处理器并启动服务器
-	http.HandleFunc("/", LogRequestWrapper(func(w http.ResponseWriter, r *http.Request) {
-		// 其他处理逻辑...
-	}))
-	http.HandleFunc("/ip-lookup", LogRequestWrapper(lookup.IPLookupHandler))
-	http.HandleFunc("/ip", LogRequestWrapper(lookup.GetIPHandler))
-	http.HandleFunc("/bilibili", LogRequestWrapper(proxy.BilibiliHandlerWithChromeTLS))
-
-	log.Println("Server running on :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatalf("Error starting server: %v", err)
+	err := router.Run(fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port))
+	if err != nil {
+		logError("Failed to start server: %v\n", err)
 	}
-}
-
-// LogRequestWrapper 包装日志记录功能
-func LogRequestWrapper(handler func(http.ResponseWriter, *http.Request)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		logger.LogHTTP(r)
-		handler(w, r)
-	}
+	defer logger.Close() // 确保在退出时关闭日志文件
 }

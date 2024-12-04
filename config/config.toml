@@ -1,0 +1,11 @@
+[server]
+host = "127.0.0.1" 
+port = 8080 
+
+[mmdb]
+asndbpath = "/data/ip/db/asn.mmdb" 
+countrydbpath = "/data/ip/db/country.mmdb"
+
+[log]
+logfilepath = "/data/ip/log/ip.log" 
+maxlogsize = 5 # MB

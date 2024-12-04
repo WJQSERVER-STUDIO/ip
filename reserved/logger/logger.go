@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
@@ -18,17 +20,15 @@ var (
 	logger       *log.Logger
 	logChannel   = make(chan string, 100)
 	quitChannel  = make(chan struct{})
-	logFileMutex sync.Mutex
-	logFilePath  = "/data/go/log/go.log"
+	logFileMutex sync.Mutex // 保护 logFile 的互斥锁
 )
 
 // Init 初始化日志记录器，接受日志文件路径作为参数
-func Init(logFilePath_input string, maxLogsize int) error {
+func Init(logFilePath string, maxLogsize int) error {
 	logFileMutex.Lock()
 	defer logFileMutex.Unlock()
 
 	var err error
-	logFilePath = logFilePath_input
 	logFile, err = os.OpenFile(logFilePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return err
@@ -64,24 +64,16 @@ func Logw(format string, args ...interface{}) {
 	Log(message)
 }
 
-// 日志等级INFO
-func LogInfo(format string, args ...interface{}) {
-	message := fmt.Sprintf(format, args...)
-	output := fmt.Sprintf("[INFO] %s", message)
-	Log(output)
-}
+// LogRequest 记录请求日志
+func LogHTTP(r *http.Request) {
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	userAgent := r.UserAgent()
+	dateTime := time.Now().Format("02/Jan/2006:15:04:05 -0700")
 
-// 日志等级WARNING
-func LogWarning(format string, args ...interface{}) {
-	message := fmt.Sprintf(format, args...)
-	output := fmt.Sprintf("[WARNING] %s", message)
-	Log(output)
-}
+	logEntry := fmt.Sprintf("%s - - [%s] \"%s %s %s\" 200 0 \"-\" \"%s\"",
+		ip, dateTime, r.Method, r.RequestURI, r.Proto, userAgent)
 
-// 日志等级ERROR
-func LogError(format string, args ...interface{}) {
-	message := fmt.Sprintf(format, args...)
-	Log(message)
+	Log(logEntry)
 }
 
 // Close 关闭日志文件
@@ -100,7 +92,7 @@ func Close() {
 func monitorLogSize(logFilePath string, maxLogsize int) {
 	var maxLogsizeBytes int64 = int64(maxLogsize) * 1024 * 1024 // 最大日志文件大小，单位为MB
 	for {
-		time.Sleep(120 * time.Minute) // 每120分钟检查一次
+		time.Sleep(600 * time.Second) // 每10分钟检查一次
 		logFileMutex.Lock()
 		info, err := logFile.Stat()
 		logFileMutex.Unlock()

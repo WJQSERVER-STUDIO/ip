@@ -67,7 +67,6 @@ func init() {
 	loadConfig()
 	setupLogger()
 	setupDB()
-	setupApi(cfg, router)
 
 	gin.SetMode(gin.ReleaseMode)
 	router = gin.Default()

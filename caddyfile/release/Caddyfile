@@ -94,6 +94,9 @@
         file_server
         import cache 60s 24h
     }
+    route /bilibili* {
+        rate_limit {remote.ip} 30r/m 10000 429
+    }
 }
 
 import /data/caddy/config.d/*

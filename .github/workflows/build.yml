@@ -55,11 +55,12 @@ jobs:
           allowUpdates: true
         env:
           export PATH: $PATH:/usr/local/go/bin     
+
   docker:
     runs-on: ubuntu-latest
     needs: build  # 确保这个作业在 build 作业完成后运行
     env:
-      IMAGE_NAME: user/image  # 定义镜像名称变量
+      IMAGE_NAME: wjqserver/ip  # 定义镜像名称变量
       DOCKERFILE: docker/dockerfile/release/Dockerfile  # 定义 Dockerfile 路径变量
 
     steps:

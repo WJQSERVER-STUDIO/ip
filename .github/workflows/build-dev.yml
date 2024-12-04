@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      IMAGE_NAME: user/image
+      IMAGE_NAME: wjqserver/ip
       DOCKERFILE: docker/dockerfile/dev/Dockerfile
         
     steps:

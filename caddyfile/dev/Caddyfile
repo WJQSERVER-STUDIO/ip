@@ -78,7 +78,6 @@
         import header_realip
     }
     import log ip
-    import cache 0s 600s
     import error_page  
     import encode
     route /* {

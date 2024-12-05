@@ -71,6 +71,9 @@ func IPHandler(c *gin.Context) {
 	// 获取User-Agent
 	ua = c.GetHeader("User-Agent")
 
+	c.Header("Access-Control-Allow-Origin", "*") // 允许跨域请求
+	c.Header("Content-Type", "application/json") // 内容类型
+
 	// 构造响应
 	response := Response{
 		IP:            ip,
@@ -108,6 +111,9 @@ func IPPureHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Invalid IP address"})
 		return
 	}
+
+	c.Header("Access-Control-Allow-Origin", "*") // 允许跨域请求
+
 	// 纯IP响应,非json格式
 	c.String(200, ip)
 }

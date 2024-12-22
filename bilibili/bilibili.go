@@ -51,7 +51,7 @@ func Bilibili(c *gin.Context) {
 
 	// 使用req库发送请求并使用chrome的TLS指纹
 	client := req.C().
-		SetUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36").
+		//SetUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36").
 		SetTLSFingerprintChrome().
 		ImpersonateChrome()
 

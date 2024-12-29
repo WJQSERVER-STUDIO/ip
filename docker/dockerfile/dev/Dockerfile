@@ -1,4 +1,4 @@
-FROM wjqserver/caddy:daily-alpine AS builder
+FROM wjqserver/caddy:alpine AS builder
 
 ARG USER=WJQSERVER-STUDIO
 ARG REPO=ip
@@ -33,7 +33,7 @@ RUN wget -O /usr/local/bin/init.sh https://raw.githubusercontent.com/${USER}/${R
 RUN chmod +x /data/${APPLICATION}/${APPLICATION}
 RUN chmod +x /usr/local/bin/init.sh
 
-FROM wjqserver/caddy:daily-alpine
+FROM wjqserver/caddy:alpine
 
 COPY --from=builder /data/www /data/www
 COPY --from=builder /data/caddy /data/caddy

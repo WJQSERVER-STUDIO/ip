@@ -3,8 +3,11 @@ host = "127.0.0.1"
 port = 8080 
 
 [mmdb]
+mmdbpath = "/data/ip/db" 
 asndbpath = "/data/ip/db/asn.mmdb" 
 countrydbpath = "/data/ip/db/country.mmdb"
+ipinfoKey = "" 
+updateFreq = 24 # hours
 
 [log]
 logfilepath = "/data/ip/log/ip.log" 

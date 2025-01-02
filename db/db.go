@@ -19,25 +19,26 @@ var (
 var (
 	asnDB          *maxminddb.Reader
 	countryDB      *maxminddb.Reader
-	ASNDB_Path     = "/data/ip/db/asn.mmdb"
-	CountryDB_Path = "/data/ip/db/country.mmdb"
+	ASNDB_Path     = "/data/ip/db/asn.mmdb"     // ASN 数据库路径
+	CountryDB_Path = "/data/ip/db/country.mmdb" // 国家数据库路径
 )
 
-// ASNDB
+// ASNDB 结构体定义
 type ASNRecord struct {
-	ASN    string `maxminddb:"asn"`
-	Domain string `maxminddb:"domain"`
-	Name   string `maxminddb:"name"`
+	ASN    string `maxminddb:"asn"`    // 自治系统编号
+	Domain string `maxminddb:"domain"` // 域名
+	Name   string `maxminddb:"name"`   // 名称
 }
 
-// CountryDB
+// CountryDB 结构体定义
 type CountryRecord struct {
-	Continent     string `maxminddb:"continent"`
-	ContinentName string `maxminddb:"continent_name"`
-	Country       string `maxminddb:"country"`
-	CountryName   string `maxminddb:"country_name"`
+	Continent     string `maxminddb:"continent"`      // 大洲代码
+	ContinentName string `maxminddb:"continent_name"` // 大洲名称
+	Country       string `maxminddb:"country"`        // 国家代码
+	CountryName   string `maxminddb:"country_name"`   // 国家名称
 }
 
+// openDB 打开数据库
 func openDB(db **maxminddb.Reader, path string) {
 	var err error
 	*db, err = maxminddb.Open(path)
@@ -47,25 +48,56 @@ func openDB(db **maxminddb.Reader, path string) {
 	}
 }
 
-// 初始化日志文件和数据库
+// DBinit 初始化日志文件和数据库
 func DBinit(cfg *config.Config) {
-	openDB(&asnDB, ASNDB_Path)
-	openDB(&countryDB, CountryDB_Path)
+	openDB(&asnDB, ASNDB_Path)         // 打开 ASN 数据库
+	openDB(&countryDB, CountryDB_Path) // 打开国家数据库
 }
 
-func SearchDB(ip net.IP) (results []string, err error) {
+// ReloadDB 重新加载数据库
+func ReloadDB() error {
+	// 关闭当前数据库连接
+	if asnDB != nil {
+		asnDB.Close()
+	}
+	if countryDB != nil {
+		countryDB.Close()
+	}
 
+	// 重新打开数据库
+	openDB(&asnDB, ASNDB_Path)
+	openDB(&countryDB, CountryDB_Path)
+
+	return nil
+}
+
+// CloseDB 关闭数据库连接
+func CloseDB() {
+	if asnDB != nil {
+		asnDB.Close() // 关闭 ASN 数据库
+		logInfo("ASN database closed successfully.")
+	}
+	if countryDB != nil {
+		countryDB.Close() // 关闭国家数据库
+		logInfo("Country database closed successfully.")
+	}
+}
+
+// SearchDB 根据 IP 地址查询 ASN 和国家信息
+func SearchDB(ip net.IP) (results []string, err error) {
 	var (
 		asn     ASNRecord
 		country CountryRecord
 	)
 
+	// 查询 ASN 信息
 	err = asnDB.Lookup(ip, &asn)
 	if err != nil {
 		logError("ASN Lookup failed: %v", err)
 		return nil, fmt.Errorf("ASN Lookup failed: %v", err)
 	}
 
+	// 查询国家信息
 	err = countryDB.Lookup(ip, &country)
 	if err != nil {
 		logError("Country Lookup failed: %v", err)
@@ -84,5 +116,4 @@ func SearchDB(ip net.IP) (results []string, err error) {
 	}
 
 	return results, nil
-
 }

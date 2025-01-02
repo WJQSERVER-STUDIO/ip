@@ -7,6 +7,7 @@ import (
 type Config struct {
 	Server ServerConfig
 	Log    LogConfig
+	Mmdb   MmdbConfig
 }
 
 type ServerConfig struct {
@@ -17,6 +18,14 @@ type ServerConfig struct {
 type LogConfig struct {
 	LogFilePath string `toml:"logfilepath"`
 	MaxLogSize  int    `toml:"maxlogsize"`
+}
+
+type MmdbConfig struct {
+	MmDBPath      string `toml:"mmdbpath"`
+	ASNDBPath     string `toml:"asndbpath"`
+	CountryDBPath string `toml:"countrydbpath"`
+	IPinfoKey     string `toml:"ipinfoKey"`
+	UpdateFreq    int    `toml:"updateFreq"`
 }
 
 // LoadConfig 从 TOML 配置文件加载配置

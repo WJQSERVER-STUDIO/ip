@@ -54,6 +54,10 @@ func setupLogger() {
 	logw("Init Completed")
 }
 
+func updateDB() {
+	db.LoopForUpdate(cfg)
+}
+
 func setupDB() {
 	db.DBinit(cfg)
 }
@@ -66,6 +70,7 @@ func init() {
 	ReadFlag()
 	loadConfig()
 	setupLogger()
+	updateDB()
 	setupDB()
 
 	gin.SetMode(gin.ReleaseMode)

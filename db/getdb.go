@@ -117,6 +117,9 @@ func GetNewDB(cfg *config.Config) error {
 				pullNewDB(cfg) // 下载最新数据库
 			}
 		}
+	} else if !isDBinfoExists(cfg) {
+		// 数据库不存在，下载最新数据库
+		pullNewDB(cfg) // 下载最新数据库
 	}
 	return nil
 }
@@ -133,6 +136,12 @@ func pullNewDB(cfg *config.Config) error {
 	err = DownloadCountryDB(cfg.Mmdb.IPinfoKey, CountryDB_Path)
 	if err != nil {
 		return fmt.Errorf("failed to download IP database: %v", err)
+	}
+
+	// 记录数据库信息到 JSON 文件
+	err = RecordDBinfo(cfg)
+	if err != nil {
+		return fmt.Errorf("failed to record DB info: %v", err)
 	}
 
 	// 重载数据库

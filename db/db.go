@@ -50,6 +50,8 @@ func openDB(db **maxminddb.Reader, path string) {
 
 // DBinit 初始化日志文件和数据库
 func DBinit(cfg *config.Config) {
+	ASNDB_Path = cfg.Mmdb.ASNDBPath
+	CountryDB_Path = cfg.Mmdb.CountryDBPath
 	openDB(&asnDB, ASNDB_Path)         // 打开 ASN 数据库
 	openDB(&countryDB, CountryDB_Path) // 打开国家数据库
 }

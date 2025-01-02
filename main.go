@@ -55,7 +55,7 @@ func setupLogger() {
 }
 
 func updateDB() {
-	db.LoopForUpdate(cfg)
+	go db.LoopForUpdate(cfg)
 }
 
 func setupDB() {

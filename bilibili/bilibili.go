@@ -3,8 +3,8 @@ package bilibili
 import (
 	"io"
 	"ip/logger"
-	"net"
 	"net/http"
+	"net/netip"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
@@ -37,7 +37,18 @@ func Bilibili(c *gin.Context) {
 	}
 
 	// 验证IP是否正确
-	if net.ParseIP(ip) == nil {
+	/*
+		if net.ParseIP(ip) == nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid ip parameter",
+			})
+			// IP METHOD URL UA PROTOCAL
+			logWarning("%s %s %s %s %s Invalid ip parameter", c.ClientIP(), c.Request.Method, c.Request.URL.Path, c.Request.Header.Get("User-Agent"), c.Request.Proto)
+			return
+		}
+	*/
+	_, err := netip.ParseAddr(ip)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid ip parameter",
 		})

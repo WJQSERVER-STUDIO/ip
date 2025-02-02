@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"ip/config"
@@ -146,35 +147,34 @@ func GetNewDB(cfg *config.Config) error {
 func pullNewDB(cfg *config.Config) error {
 	CloseDB() // 关闭当前数据库连接
 
-	var err error
+	var errs []error // 使用切片收集所有错误
 
 	// 下载 ASN 数据库文件
-	err = DownloadASNDB(cfg.Mmdb.IPinfoKey, ASNDB_Path)
-	if err != nil {
+	if err := DownloadASNDB(cfg.Mmdb.IPinfoKey, ASNDB_Path); err != nil {
 		logError("Failed to download ASN database: %v", err)
-		return fmt.Errorf("failed to download ASN database: %v", err)
+		errs = append(errs, fmt.Errorf("download ASN database: %w", err))
 	}
+
 	// 下载 IP 数据库文件
-	err = DownloadCountryDB(cfg.Mmdb.IPinfoKey, CountryDB_Path)
-	if err != nil {
+	if err := DownloadCountryDB(cfg.Mmdb.IPinfoKey, CountryDB_Path); err != nil {
 		logError("Failed to download IP database: %v", err)
-		return fmt.Errorf("failed to download IP database: %v", err)
+		errs = append(errs, fmt.Errorf("download IP database: %w", err))
 	}
 
 	// 记录数据库信息到 JSON 文件
-	err = RecordDBinfo(cfg)
-	if err != nil {
+	if err := RecordDBinfo(cfg); err != nil {
 		logError("Failed to record DB info: %v", err)
-		return fmt.Errorf("failed to record DB info: %v", err)
+		errs = append(errs, fmt.Errorf("record DB info: %w", err))
 	}
 
-	// 重载数据库
-	err = ReloadDB()
-	if err != nil {
+	// 无论前面是否出错，都尝试重载数据库
+	if err := ReloadDB(); err != nil {
 		logError("Failed to reload database: %v", err)
-		return fmt.Errorf("failed to reload database: %v", err)
+		errs = append(errs, fmt.Errorf("reload database: %w", err))
 	}
-	return nil
+
+	// 合并所有错误（Go 1.20+ 支持 errors.Join）
+	return errors.Join(errs...)
 }
 
 // DownloadASNDB 下载 ASN 数据库文件

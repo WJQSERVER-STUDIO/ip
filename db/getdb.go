@@ -110,6 +110,7 @@ func GetNewDB(cfg *config.Config) error {
 	if isDBinfoExists(cfg) {
 		// 检测数据库是否存在
 		if !isDBExists(ASNDB_Path, CountryDB_Path) {
+			logInfo("MmDB not found, downloading...")
 			err = pullNewDB(cfg) // 下载最新数据库
 			if err != nil {
 				logError("Failed to download new database: %v", err)
@@ -120,6 +121,7 @@ func GetNewDB(cfg *config.Config) error {
 		if isDBExists(ASNDB_Path, CountryDB_Path) {
 			// 检测是否需要更新数据库
 			if Is2Update(cfg) {
+				logInfo("MmDB need to Update, downloading...")
 				err = pullNewDB(cfg) // 下载最新数据库
 				if err != nil {
 					logError("Failed to download new database: %v", err)
@@ -130,6 +132,7 @@ func GetNewDB(cfg *config.Config) error {
 		}
 	} else if !isDBinfoExists(cfg) {
 		// 数据库不存在，下载最新数据库
+		logInfo("MmDB not found, downloading...")
 		err = pullNewDB(cfg) // 下载最新数据库
 		if err != nil {
 			logError("Failed to download database: %v", err)
@@ -143,26 +146,32 @@ func GetNewDB(cfg *config.Config) error {
 func pullNewDB(cfg *config.Config) error {
 	CloseDB() // 关闭当前数据库连接
 
+	var err error
+
 	// 下载 ASN 数据库文件
-	err := DownloadASNDB(cfg.Mmdb.IPinfoKey, ASNDB_Path)
+	err = DownloadASNDB(cfg.Mmdb.IPinfoKey, ASNDB_Path)
 	if err != nil {
+		logError("Failed to download ASN database: %v", err)
 		return fmt.Errorf("failed to download ASN database: %v", err)
 	}
 	// 下载 IP 数据库文件
 	err = DownloadCountryDB(cfg.Mmdb.IPinfoKey, CountryDB_Path)
 	if err != nil {
+		logError("Failed to download IP database: %v", err)
 		return fmt.Errorf("failed to download IP database: %v", err)
 	}
 
 	// 记录数据库信息到 JSON 文件
 	err = RecordDBinfo(cfg)
 	if err != nil {
+		logError("Failed to record DB info: %v", err)
 		return fmt.Errorf("failed to record DB info: %v", err)
 	}
 
 	// 重载数据库
 	err = ReloadDB()
 	if err != nil {
+		logError("Failed to reload database: %v", err)
 		return fmt.Errorf("failed to reload database: %v", err)
 	}
 	return nil

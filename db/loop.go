@@ -6,10 +6,11 @@ import (
 )
 
 func LoopForUpdate(cfg *config.Config) {
+	var err error
 	for {
 		if Is2Update(cfg) {
 			logInfo("Updating database...")
-			err := GetNewDB(cfg)
+			err = GetNewDB(cfg)
 			if err != nil {
 				logWarning("Failed to update database: %s", err)
 			}

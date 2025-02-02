@@ -1,5 +1,10 @@
 # 更新日志
 
+25w03a
+---
+- CHANGE: 改进logger
+- CHANGE: 更新依赖库
+
 v2.1.1
 ---
 - CHANGE: 更新Go版本至1.23.5

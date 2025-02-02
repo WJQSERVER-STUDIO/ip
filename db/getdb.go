@@ -106,20 +106,36 @@ func Is2Update(cfg *config.Config) bool {
 }
 
 func GetNewDB(cfg *config.Config) error {
+	var err error
 	if isDBinfoExists(cfg) {
 		// 检测数据库是否存在
 		if !isDBExists(ASNDB_Path, CountryDB_Path) {
-			pullNewDB(cfg) // 下载最新数据库
+			err = pullNewDB(cfg) // 下载最新数据库
+			if err != nil {
+				logError("Failed to download new database: %v", err)
+				return fmt.Errorf("failed to download new database: %v", err)
+			}
+			logInfo("Successfully downloaded new MmDB")
 		}
 		if isDBExists(ASNDB_Path, CountryDB_Path) {
 			// 检测是否需要更新数据库
 			if Is2Update(cfg) {
-				pullNewDB(cfg) // 下载最新数据库
+				err = pullNewDB(cfg) // 下载最新数据库
+				if err != nil {
+					logError("Failed to download new database: %v", err)
+					return fmt.Errorf("failed to download new database: %v", err)
+				}
+				logInfo("Successfully to Update MmDB")
 			}
 		}
 	} else if !isDBinfoExists(cfg) {
 		// 数据库不存在，下载最新数据库
-		pullNewDB(cfg) // 下载最新数据库
+		err = pullNewDB(cfg) // 下载最新数据库
+		if err != nil {
+			logError("Failed to download database: %v", err)
+			return fmt.Errorf("failed to download database: %v", err)
+		}
+		logInfo("Successfully downloaded MmDB")
 	}
 	return nil
 }
@@ -160,12 +176,14 @@ func DownloadASNDB(token string, outputPath string) error {
 	// 发起 GET 请求
 	resp, err := http.Get(url)
 	if err != nil {
+		logError("Failed to download ASN database: %v", err)
 		return fmt.Errorf("failed to download ASN database: %v", err)
 	}
 	defer resp.Body.Close() // 确保在函数结束时关闭响应体
 
 	// 检查响应状态
 	if resp.StatusCode != http.StatusOK {
+		logError("Failed to download ASN database: received status code %d", resp.StatusCode)
 		return fmt.Errorf("failed to download ASN database: received status code %d", resp.StatusCode)
 	}
 
@@ -174,6 +192,7 @@ func DownloadASNDB(token string, outputPath string) error {
 		// 如果文件存在，删除旧文件
 		err = os.Remove(outputPath)
 		if err != nil {
+			logError("Failed to remove existing file: %v", err)
 			return fmt.Errorf("failed to remove existing file: %v", err)
 		}
 	}
@@ -181,6 +200,7 @@ func DownloadASNDB(token string, outputPath string) error {
 	// 创建输出文件并设置权限
 	outFile, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY, 0644) // 设置文件权限为 0644
 	if err != nil {
+		logError("Failed to create output file: %v", err)
 		return fmt.Errorf("failed to create output file: %v", err)
 	}
 	defer outFile.Close() // 确保在函数结束时关闭文件
@@ -188,6 +208,7 @@ func DownloadASNDB(token string, outputPath string) error {
 	// 将响应体内容写入文件
 	_, err = io.Copy(outFile, resp.Body)
 	if err != nil {
+		logError("Failed to write to output file: %v", err)
 		return fmt.Errorf("failed to write to output file: %v", err)
 	}
 
@@ -202,12 +223,14 @@ func DownloadCountryDB(token string, outputPath string) error {
 	// 发起 GET 请求
 	resp, err := http.Get(url)
 	if err != nil {
+		logError("Failed to download IP database: %v", err)
 		return fmt.Errorf("failed to download Country database: %v", err)
 	}
 	defer resp.Body.Close() // 确保在函数结束时关闭响应体
 
 	// 检查响应状态
 	if resp.StatusCode != http.StatusOK {
+		logError("Failed to download IP database: received status code %d", resp.StatusCode)
 		return fmt.Errorf("failed to download Country database: received status code %d", resp.StatusCode)
 	}
 
@@ -216,6 +239,7 @@ func DownloadCountryDB(token string, outputPath string) error {
 		// 如果文件存在，删除旧文件
 		err = os.Remove(outputPath)
 		if err != nil {
+			logError("Failed to remove existing file: %v", err)
 			return fmt.Errorf("failed to remove existing file: %v", err)
 		}
 	}
@@ -223,6 +247,7 @@ func DownloadCountryDB(token string, outputPath string) error {
 	// 创建输出文件并设置权限
 	outFile, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY, 0644) // 设置文件权限为 0644
 	if err != nil {
+		logError("Failed to create output file: %v", err)
 		return fmt.Errorf("failed to create output file: %v", err)
 	}
 	defer outFile.Close() // 确保在函数结束时关闭文件
@@ -230,6 +255,7 @@ func DownloadCountryDB(token string, outputPath string) error {
 	// 将响应体内容写入文件
 	_, err = io.Copy(outFile, resp.Body)
 	if err != nil {
+		logError("Failed to write to output file: %v", err)
 		return fmt.Errorf("failed to write to output file: %v", err)
 	}
 

@@ -1,5 +1,13 @@
 # 更新日志
 
+v2.1.2
+---
+- CHANGE: 更新依赖库
+
+25w03b
+---
+- CHANGE: 更新依赖库
+
 25w03a
 ---
 - CHANGE: 改进logger

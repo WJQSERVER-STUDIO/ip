@@ -47,8 +47,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/icholy/digest v1.1.0 h1:HfGg9Irj7i+IX1o1QAmPfIBNu/Q5A5Tu3n/MED9k9H4=
 github.com/icholy/digest v1.1.0/go.mod h1:QNrsSGQ5v7v9cReDI0+eyjsXGUoRSUZQHeQ5C4XLa0Y=
-github.com/imroc/req/v3 v3.52.2 h1:xJocr1aIv0a2K9knfBQ4JnZHk+kWTITdjf0mgDg229I=
-github.com/imroc/req/v3 v3.52.2/go.mod h1:dBGsDloOSZJcFs6PnTjZXYBJK70OXbZpizHBLNqcH2k=
+github.com/imroc/req/v3 v3.53.0 h1:JMjOLB7Yr4ASaH9VVbiO2FsWZWOPV3/0HES2BZmQYxA=
+github.com/imroc/req/v3 v3.53.0/go.mod h1:qRZ7XBw5r3hQZcMtiEjV04sG9mUaZMMShRonBO3jHdA=
 github.com/json-iterator/go v1.1.12 h1:PV8peI4a0ysnczrg+LtxykD8LfKY9ML6u2jnxaEnrnM=
 github.com/json-iterator/go v1.1.12/go.mod h1:e30LSqwooZae/UwlEbR2852Gd8hjQvJoHmT4TnhNGBo=
 github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=

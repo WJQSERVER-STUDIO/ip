@@ -5,7 +5,7 @@ go 1.24.3
 require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/gin-gonic/gin v1.10.1
-	github.com/imroc/req/v3 v3.52.2
+	github.com/imroc/req/v3 v3.53.0
 	github.com/oschwald/maxminddb-golang v1.13.1
 )
 

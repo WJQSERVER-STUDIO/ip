@@ -14,7 +14,7 @@
 ## 部署
 
 ```
-docker run -d -p 8980:80 -v ./ipinfo/db:/data/ipinfo/db -v ./ipinfo/log:/data/ipinfo/log --restart always wjqserver/ip:latest
+docker run -d -p 8980:8080 -v ./ipinfo/db:/data/ipinfo/db -v ./ipinfo/log:/data/ipinfo/log --restart always wjqserver/ip:latest
 ```
 
 需导入mmdb数据库(ipinfo)才可正常使用自有API

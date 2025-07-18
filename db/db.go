@@ -3,17 +3,18 @@ package db
 import (
 	"fmt"
 	"ip/config"
-	"ip/logger"
-	"net"
+	"net/netip"
 
-	"github.com/oschwald/maxminddb-golang"
+	"github.com/fenthope/reco"
+
+	"github.com/oschwald/maxminddb-golang/v2"
 )
 
 var (
-	logw       = logger.Logw
-	logInfo    = logger.LogInfo
-	logWarning = logger.LogWarning
-	logError   = logger.LogError
+	logger     *reco.Logger
+	logError   = logger.Errorf
+	logWarning = logger.Warnf
+	logInfo    = logger.Infof
 )
 
 var (
@@ -46,6 +47,13 @@ func openDB(db **maxminddb.Reader, path string) {
 		logError("Error opening database at %s: %v", path, err)
 		return
 	}
+}
+
+func LoggerInit(recorder *reco.Logger) {
+	logger = recorder
+	logError = logger.Errorf
+	logWarning = logger.Warnf
+	logInfo = logger.Infof
 }
 
 // DBinit 初始化日志文件和数据库
@@ -86,21 +94,24 @@ func CloseDB() {
 }
 
 // SearchDB 根据 IP 地址查询 ASN 和国家信息
-func SearchDB(ip net.IP) (results []string, err error) {
+func SearchDB(ip netip.Addr) (results []string, err error) {
 	var (
 		asn     ASNRecord
 		country CountryRecord
 	)
 
 	// 查询 ASN 信息
-	err = asnDB.Lookup(ip, &asn)
+	// v1 func (r *maxminddb.Reader) Lookup(ip net.IP, result any) error
+	// v2 func (r *maxminddb.Reader) Lookup(ip netip.Addr) maxminddb.Result
+	err = asnDB.Lookup(ip).Decode(&asn)
 	if err != nil {
 		logError("ASN Lookup failed: %v", err)
 		return nil, fmt.Errorf("ASN Lookup failed: %v", err)
 	}
 
 	// 查询国家信息
-	err = countryDB.Lookup(ip, &country)
+	//err = countryDB.Lookup(ip, &country)
+	err = countryDB.Lookup(ip).Decode(&country)
 	if err != nil {
 		logError("Country Lookup failed: %v", err)
 		return nil, fmt.Errorf("Country Lookup failed: %v", err)

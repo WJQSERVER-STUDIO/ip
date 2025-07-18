@@ -2,17 +2,10 @@ package ip
 
 import (
 	"ip/db"
-	"ip/logger"
 	"net"
+	"net/netip"
 
-	"github.com/gin-gonic/gin"
-)
-
-var (
-	logw       = logger.Logw
-	logInfo    = logger.LogInfo
-	logWarning = logger.LogWarning
-	logError   = logger.LogError
+	"github.com/infinite-iroha/touka"
 )
 
 // 构造响应json
@@ -28,7 +21,7 @@ type Response struct {
 	UserAgent     string `json:"user_agent"`
 }
 
-func IPHandler(c *gin.Context) {
+func IPHandler(c *touka.Context) {
 
 	var (
 		ip string
@@ -40,36 +33,27 @@ func IPHandler(c *gin.Context) {
 	if ipStr != "" && net.ParseIP(ipStr) != nil {
 		ip = ipStr
 	} else {
-		// 优先获取X-Forwarded-For，其次是X-Real-IP,最后是c.clientIP()
-		fwdIP := c.GetHeader("X-Forwarded-For")
-		realIP := c.GetHeader("X-Real-IP")
-		if fwdIP != "" {
-			ip = fwdIP
-		} else if realIP != "" {
-			ip = realIP
-		} else {
-			ip = c.ClientIP()
-		}
+		ip = c.ClientIP()
 	}
 
 	// 预处理IP地址，转为net.IP类型
-	netIP := net.ParseIP(ip)
-	if netIP == nil {
-		logWarning("Invalid IP address: ", ip)
-		c.JSON(400, gin.H{"error": "Invalid IP address"})
+	netIP, err := netip.ParseAddr(ip)
+	if err != nil {
+		c.Warnf("Invalid IP address: %s", ip)
+		c.JSON(400, touka.H{"error": "Invalid IP address"})
 		return
 	}
 
 	// call DB 获取 GeoIP 数据
 	results, err := db.SearchDB(netIP)
 	if err != nil {
-		logError("SearchDB error: ", err)
-		c.JSON(500, gin.H{"error": "Internal Server Error"})
+		c.Errorf("SearchDB error: %s", err)
+		c.JSON(500, touka.H{"error": "Internal Server Error"})
 		return
 	}
 
 	// 获取User-Agent
-	ua = c.GetHeader("User-Agent")
+	ua = c.UserAgent()
 
 	c.Header("Access-Control-Allow-Origin", "*") // 允许跨域请求
 	c.Header("Content-Type", "application/json") // 内容类型
@@ -91,29 +75,19 @@ func IPHandler(c *gin.Context) {
 	c.JSON(200, response)
 }
 
-func IPPureHandler(c *gin.Context) {
-	var ip string
-	// 优先获取X-Forwarded-For，其次是X-Real-IP,最后是c.clientIP()
-	fwdIP := c.GetHeader("X-Forwarded-For")
-	realIP := c.GetHeader("X-Real-IP")
-	if fwdIP != "" {
-		ip = fwdIP
-	} else if realIP != "" {
-		ip = realIP
-	} else {
-		ip = c.ClientIP()
-	}
+func IPPureHandler(c *touka.Context) {
+	ip := c.ClientIP()
 
 	// 预处理IP地址，转为net.IP类型
 	netIP := net.ParseIP(ip)
 	if netIP == nil {
-		logWarning("Invalid IP address: ", ip)
-		c.JSON(400, gin.H{"error": "Invalid IP address"})
+		c.Warnf("Invalid IP address: %s", ip)
+		c.JSON(400, touka.H{"error": "Invalid IP address"})
 		return
 	}
 
 	c.Header("Access-Control-Allow-Origin", "*") // 允许跨域请求
 
 	// 纯IP响应,非json格式
-	c.String(200, ip)
+	c.Text(200, ip)
 }

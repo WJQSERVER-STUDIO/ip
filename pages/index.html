@@ -1,288 +1,302 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="IP地址查询">
-    <title>IP地址查询</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="description" content="一个简洁高效的多源 IP 地址查询工具">
+    <title>IP 地址查询</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css"
-        integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl7/1L_dstPt3HV5HzF6Gvk/e3s4Wz6iJgD/+ub2oU" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://font.sec.miui.com/font/css?family=MiSans:400,500:MiSans">
     <style>
+        :root {
+            --bg-color: #e0e5ec;
+            --surface-color: #e0e5ec;
+            --primary-text-color: #3c4043;
+            --secondary-text-color: #5f6368;
+            --border-color: rgba(0, 0, 0, 0.05);
+            --shadow-light: #ffffff;
+            --shadow-dark: #a3b1c6;
+            --primary-color: #007aff;
+            --font-family: 'MiSans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #2a2a2e;
+                --surface-color: #2a2a2e;
+                --primary-text-color: #f5f5f7;
+                --secondary-text-color: #8e8e93;
+                --border-color: rgba(255, 255, 255, 0.1);
+                --shadow-light: #353539;
+                --shadow-dark: #1f1f23;
+                --primary-color: #0a84ff;
+            }
+        }
+
+        /* --- 基础与布局 --- */
         body {
-            font-family: 'Misans', Arial, sans-serif;
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--primary-text-color);
+            margin: 0;
+            padding: 1rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-
-        .card .card-header .btn-collapse {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 3rem;
-            height: 3rem;
-            background-color: #f7f7f9;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-
-        .card .card-header .btn-collapse i {
-            font-size: 1.25rem;
-        }
-
-        .card .card-body.collapsed {
-            display: none;
-        }
-
         .container {
-            margin-top: 50px;
+            max-width: 1400px; /* 适配更宽的屏幕 */
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
+        
+        /* --- 主信息区 --- */
+        .public-ip-block {
+            padding: 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
+            background-color: var(--surface-color);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        }
+        .public-ip-block .ip-address {
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+        .public-ip-block .copy-btn {
+            background: none; border: none; color: var(--secondary-text-color);
+            cursor: pointer; margin-left: 0.5rem; vertical-align: middle;
+        }
+        
+        /* --- 响应式卡片网格 --- */
+        .cards-grid {
+            display: grid;
+            gap: 1.5rem;
+            /* 关键: 响应式布局 */
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+        
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+        }
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem 1.5rem; cursor: pointer; border-bottom: 1px solid var(--border-color);
+            user-select: none;
+        }
+        .card-header h2 { font-size: 1.1rem; font-weight: 500; margin: 0; }
+        .card-body {
+            padding: 1.5rem; font-size: 0.95rem; line-height: 1.8;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out;
+            max-height: 1000px;
+        }
+        .card.is-collapsed .card-body { max-height: 0; padding-top: 0; padding-bottom: 0; opacity: 0; overflow: hidden; }
+        
+        .toggle-icon { color: var(--secondary-text-color); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card.is-collapsed .toggle-icon { transform: rotate(-90deg); }
+        .flag-icon { margin-left: 0.5rem; border-radius: 2px; box-shadow: 0 0 1px rgba(0,0,0,0.2); }
+        
+        strong { font-weight: 500; color: var(--secondary-text-color); }
+        footer { text-align: center; color: var(--secondary-text-color); margin-top: 3rem; font-size: 0.875rem; }
+        footer a { color: var(--primary-color); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
     </style>
-    <link rel="stylesheet" href="https://font.sec.miui.com/font/css?family=MiSans:400,550:MiSans">
 </head>
-
 <body>
     <div class="container">
-        <!-- 1号块：本地API信息 -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header">
-                本地API查询结果
-                <div class="btn-collapse" onclick="toggleCardBody(this.parentNode.parentNode)">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="card-body">
-                <p class="card-text" id="localinfo">正在获取连接信息...</p>
-            </div>
-        </div>
+        <header style="text-align: center; margin-bottom: 2.5rem;">
+            <h1>IP 地址查询</h1>
+            <p style="color: var(--secondary-text-color);">聚合多个 API 的查询结果</p>
+        </header>
+        
+        <section id="public-ip-block" class="public-ip-block">
+            <p class="card-text">正在获取您的公网 IP 地址...</p>
+        </section>
 
-        <!-- 2号块：Cloudflare API 信息 -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header">
-                Cloudflare API 查询结果
-                <div class="btn-collapse" onclick="toggleCardBody(this.parentNode.parentNode)">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="card-body">
-                <p class="card-text" id="cloudflare-info">正在获取连接信息...</p>
-            </div>
-        </div>
-
-        <!-- 3号块：Bilibili API 信息 -->
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-header">
-                Bilibili API 查询结果
-                <div class="btn-collapse" onclick="toggleCardBody(this.parentNode.parentNode)">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="card-body">
-                <p class="card-text" id="bilibili-info">正在获取连接信息...</p>
-            </div>
-        </div>
-
-        <!-- 3号块：IPAPI.CO API 信息 -->
-
-        <div class="card shadow-sm mb-4">
-            <div class="card-header">
-                IPAPI.CO 查询结果
-                <div class="btn-collapse" onclick="toggleCardBody(this.parentNode.parentNode)">
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            <div class="card-body">
-                <p class="card-text" id="ipapico-info">正在获取连接信息...</p>
-            </div>
-        </div>
-
-        <script>
-
-            const MAX_HTTPS_FAILURES = 3;
-            let httpsFailureCount = 0;
-            let isHttpsAvailable = false;
-
-            function toggleCardBody(card) {
-                const cardBody = card.querySelector('.card-body');
-                const collapseBtn = card.querySelector('.btn-collapse');
-
-                cardBody.classList.toggle('collapsed');
-                if (cardBody.classList.contains('collapsed')) {
-                    collapseBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
-                } else {
-                    collapseBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
-                }
-            }
-
-            function getQueryParam(param) {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get(param);
-            }
-
-            async function fetchIPData() {
-                const ip = getQueryParam('ip');
-                const protocolAndHost = window.location.protocol + '//' + window.location.host;
-                const apiUrl = ip ? `${protocolAndHost}/ip-lookup?ip=${ip}` : `${protocolAndHost}/api/ip-lookup`;
-
-                try {
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
-                    updateResult(data);
-                    console.log("Request succeeded.");
-                } catch (error) {
-                    console.error('Request failed.');
-                    document.getElementById('result').innerHTML = '查询失败，请检查网络连接。';
-                }
-            }
-            function updateResult(data) {
-                const countryCode = data.country_code ? data.country_code.toLowerCase() : '';
-                const flagIcon = countryCode ? `<span class="flag-icon flag-icon-${countryCode}"></span>` : '';
-
-                const result = `
-                <strong>IP地址:</strong> ${data.ip || '未知'}<br>
-                <strong>ASN:</strong> ${data.asn || '未知'}<br>               
-                <strong>ISP:</strong> ${data.isp || '未知'}<br>
-                <strong>ISP网站:</strong> ${data.domain || '未知'}<br>
-                <strong>大洲代码:</strong> ${data.continent_code || '未知'}<br>
-                <strong>大洲全称:</strong> ${data.continent_name || '未知'}<br>
-                <strong>国家/地区代码:</strong> ${data.country_code || '未知'} ${flagIcon}<br>
-                <strong>国家/地区全称:</strong> ${data.country_name || '未知'}<br>
-                <strong>User-Agent:</strong> ${data.user_agent || '未知'}
-            `;
-                document.getElementById('localinfo').innerHTML = result;
-            }
-
-            async function fetchCloudflareTraceData() {
-                try {
-                    const response = await fetch('https://www.cloudflare.com/cdn-cgi/trace');
-                    const text = await response.text();
-                    const data = text.split('\n').reduce((obj, line) => {
-                        const parts = line.split('=');
-                        if (parts.length === 2) {
-                            obj[parts[0]] = parts[1];
-                        }
-                        return obj;
-                    }, {});
-
-                    const countryCode = data.loc ? data.loc.toLowerCase() : '';
-                    const flagIcon = countryCode ? `<span class="flag-icon flag-icon-${countryCode}"></span>` : '';
-
-                    const infoHtml = `
-                    <strong>IP地址:</strong> ${data.ip}<br>
-                    <strong>国家/地区:</strong> ${data.loc} ${flagIcon}<br>                    
-                    <strong>Cloudflare数据中心:</strong> ${data.colo}<br>
-                    <strong>HTTP版本:</strong> ${data.http}<br>
-                    <strong>TLS版本:</strong> ${data.tls}<br>
-                    <strong>User-Agent:</strong> ${data.uag}<br>
-                    <strong>线路:</strong> ${data.fl}<br>
-                `;
-
-                    document.getElementById('cloudflare-info').innerHTML = infoHtml;
-                } catch (error) {
-                    console.error('Request to Cloudflare trace failed: ', error);
-                    document.getElementById('cloudflare-info').innerHTML = 'Cloudflare无法连接';
-                }
-            }
-
-            async function fetchBilibiliIPData() {
-                try {
-                    const responseIP = await fetch('https://myip.ipip.net/json');
-                    if (!responseIP.ok) {
-                        throw new Error('IP API response was not ok');
-                    }
-                    const dataIP = await responseIP.json();
-                    const ip = dataIP.data.ip;
-                    const protocolAndHost = window.location.protocol + '//' + window.location.host;
-                    const apiUrl = `${protocolAndHost}/api/bilibili?ip=${ip}`;
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
-                    if (data.code === 0 && data.data) {
-                        const result = `
-                <strong>IP地址:</strong> ${data.data.addr || '未知'}<br>
-                <strong>国家:</strong> ${data.data.country || '未知'}<br>
-                <strong>省份:</strong> ${data.data.province || '未知'}<br>
-                <strong>城市:</strong> ${data.data.city || '未知'}<br>
-                <strong>ISP:</strong> ${data.data.isp || '未知'}<br>
-                <strong>纬度:</strong> ${data.data.latitude || '未知'}<br>
-                <strong>经度:</strong> ${data.data.longitude || '未知'}
-            `;
-                        document.getElementById('bilibili-info').innerHTML = result;
-                    } else {
-                        throw new Error('Data retrieval was unsuccessful');
-                    }
-                } catch (error) {
-                    console.error('Request to Bilibili IP API failed: ', error);
-                    document.getElementById('bilibili-info').innerHTML = '无法获取数据，请检查网络连接。';
-                }
-            }
-
-            async function fetchIPAPICO() {
-                try {
-                    const response = await fetch('https://ipapi.co/json');
-                    const data = await response.json();
-
-                    const countryCode = data.country_code.toLowerCase();
-                    const flagIcon = countryCode ? `<span class="flag-icon flag-icon-${countryCode}"></span>` : '';
-
-                    const infoHtml = `
-            <strong>IP地址:</strong> ${data.ip}<br>
-            <strong>ASN:</strong> ${data.asn}<br>
-            <strong>ISP:</strong> ${data.org}<br>
-            <strong>国家/地区代码:</strong> ${data.country} ${flagIcon}<br>  
-            <strong>国家/地区全称:</strong> ${data.country_name} <br>
-            <strong>地区:</strong> ${data.region}<br>
-            <strong>城市:</strong> ${data.city}<br>
-            <strong>纬度:</strong> ${data.latitude}<br>
-            <strong>经度:</strong> ${data.longitude}<br>
-            <strong>时区:</strong> ${data.timezone}<br>
-            <strong>国际区号:</strong> ${data.country_calling_code}<br>
-            <strong>货币:</strong> ${data.currency}<br>
-                              
-        `;
-
-                    document.getElementById('ipapico-info').innerHTML = infoHtml;
-                } catch (error) {
-                    console.error('请求 IPAPI.CO 跟踪失败：', error);
-                    document.getElementById('ipapico-info').innerHTML = '无法获取连接信息';
-                }
-            }
-
-            document.addEventListener('DOMContentLoaded', () => {
-                const userIp = getQueryParam('ip');
-                fetchIPData();
-                fetchCloudflareTraceData();
-                fetchBilibiliIPData(userIp);
-                fetchIPAPICO();
-            });
-        </script>
-</body>
-
-<footer>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <p>
-                Copyright &copy; 2024 WJQSERVER-STUDIO
-                </p>
-            </div>
-            <div class="col-md-6">
-                <p>
-                    GitHub仓库地址：<a href="https://github.com/WJQSERVER-STUDIO/ip">https://github.com/WJQSERVER-STUDIO/ip</a>
-                </p>
-            </div>
-        </div>
+        <main id="cards-container" class="cards-grid"></main>
     </div>
-</footer>
+    <footer class="container">
+        <p>Copyright © 2024 WJQSERVER-STUDIO</p>
+        <p><a href="https://github.com/WJQSERVER-STUDIO/ip" target="_blank" rel="noopener noreferrer">GitHub Repository</a></p>
+    </footer>
 
+    <template id="info-card-template">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"></h2>
+                <span class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>
+                </span>
+            </div>
+            <div class="card-body"><p class="card-text">正在获取连接信息...</p></div>
+        </div>
+    </template>
+
+    <script>
+    // --- 配置与常量 ---
+    const API_CONFIG = [
+        { id: 'localinfo', title: '本地 API 查询结果', fetcher: fetchLocalAPI },
+        { id: 'cloudflare-info', title: 'Cloudflare API 查询结果', fetcher: fetchCloudflareTraceData },
+        { id: 'bilibili-info', title: 'Bilibili API 查询结果', fetcher: fetchBilibiliIPData },
+        { id: 'ipapico-info', title: 'IPAPI.CO 查询结果', fetcher: fetchIPAPICO }
+    ];
+    const FETCH_TIMEOUT = 8000;
+
+    // --- 逻辑入口: 去中心化调度 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('cards-container');
+        const template = document.getElementById('info-card-template');
+
+        // 立即、并行地启动所有组件的独立加载
+        renderPublicIpBlock(); 
+        
+        API_CONFIG.forEach(api => {
+            const cardNode = template.content.cloneNode(true);
+            const cardElement = cardNode.querySelector('.card');
+            cardElement.querySelector('.card-title').textContent = api.title;
+            const cardText = cardElement.querySelector('.card-text');
+            cardText.id = api.id;
+            
+            cardElement.querySelector('.card-header').addEventListener('click', () => {
+                cardElement.classList.toggle('is-collapsed');
+            });
+            container.appendChild(cardNode);
+
+            // 每个 fetcher 都是独立的, 自行处理依赖和错误
+            api.fetcher().catch(err => {
+                console.error(`[${api.id}] Fetcher failed:`, err);
+                renderCardContent(api.id, `加载失败: ${err.message}`, true);
+            });
+        });
+    });
+
+    // --- 统一的辅助函数 ---
+    let publicIpPromise = null;
+    const getPublicIP = () => {
+        if (!publicIpPromise) {
+            publicIpPromise = fetch('/api/ip').then(res => {
+                if (!res.ok) throw new Error(`无法连接后端 API (${res.status})`);
+                return res.text();
+            });
+        }
+        return publicIpPromise;
+    };
+
+    const getQueryParam = param => new URLSearchParams(window.location.search).get(param);
+
+    function renderCardContent(elementId, content, isError = false) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerHTML = content;
+            if (isError) element.style.color = 'var(--error-color)';
+        }
+    }
+    
+    function copyToClipboard(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+            btn.innerHTML = '已复制!';
+            setTimeout(() => { btn.innerHTML = '复制'; }, 2000);
+        });
+    }
+
+    // --- 各 API 的 Fetcher 函数 (完全独立, 自给自足) ---
+    async function renderPublicIpBlock() {
+        try {
+            const ip = await getPublicIP();
+            const block = document.getElementById('public-ip-block');
+            block.innerHTML = `
+                <span class="ip-address">${ip}</span>
+                <button class="copy-btn" title="复制IP地址" onclick="copyToClipboard('${ip}', this)">复制</button>
+            `;
+        } catch (error) {
+            renderCardContent('public-ip-block', `获取公网 IP 失败: ${error.message}`, true);
+        }
+    }
+
+    async function fetchLocalAPI() {
+        const elementId = 'localinfo';
+        try {
+            const ip = getQueryParam('ip') || await getPublicIP();
+            const apiUrl = `/api/ip-lookup?ip=${ip}`;
+            
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`网络响应错误 (${response.status})`);
+            
+            const data = await response.json();
+            const flag = data.country_code ? `<span class="flag-icon flag-icon-${data.country_code.toLowerCase()}"></span>` : '';
+
+            renderCardContent(elementId, `
+                <strong>IP地址:</strong> ${data.ip || '未知'}<br>
+                <strong>ASN:</strong> ${data.asn || '未知'}<br>
+                <strong>ISP:</strong> ${data.isp || '未知'}<br>
+                <strong>国家/地区:</strong> ${data.country_name || '未知'} ${flag}<br>
+                <strong>User-Agent:</strong> ${data.user_agent || '未知'}
+            `);
+        } catch (error) { renderCardContent(elementId, `查询失败: ${error.message}`, true); }
+    }
+
+    async function fetchCloudflareTraceData() {
+        const elementId = 'cloudflare-info';
+        try {
+            const response = await fetch('https://www.cloudflare.com/cdn-cgi/trace');
+            const data = Object.fromEntries(new URLSearchParams(await response.text().then(t => t.replace(/\n/g, "&"))));
+            const flag = data.loc ? `<span class="flag-icon flag-icon-${data.loc.toLowerCase()}"></span>` : '';
+
+            renderCardContent(elementId, `
+                <strong>IP地址:</strong> ${data.ip}<br>
+                <strong>国家/地区:</strong> ${data.loc} ${flag}<br>
+                <strong>Cloudflare数据中心:</strong> ${data.colo}<br>
+                <strong>协议:</strong> ${data.http}<br>
+                <strong>线路:</strong> ${data.fl}
+            `);
+        } catch (error) { renderCardContent(elementId, `Cloudflare 无法连接: ${error.message}`, true); }
+    }
+
+    async function fetchBilibiliIPData() {
+        const elementId = 'bilibili-info';
+        try {
+            const targetIp = getQueryParam('ip') || await getPublicIP();
+            const response = await fetch(`/api/bilibili?ip=${targetIp}`);
+            if (!response.ok) throw new Error(`网络响应错误 (${response.status})`);
+            
+            const data = await response.json();
+            if (data.code !== 0 || !data.data) throw new Error('API 返回无效数据');
+            
+            renderCardContent(elementId, `
+                <strong>IP地址:</strong> ${data.data.addr || targetIp}<br>
+                <strong>位置:</strong> ${data.data.country || ''} ${data.data.province || ''} ${data.data.city || ''}<br>
+                <strong>ISP:</strong> ${data.data.isp || '未知'}
+            `);
+        } catch (error) { renderCardContent(elementId, `获取数据失败: ${error.message}`, true); }
+    }
+    
+    async function fetchIPAPICO() {
+        const elementId = 'ipapico-info';
+        try {
+            const ipQuery = getQueryParam('ip');
+            const apiUrl = ipQuery ? `https://ipapi.co/${ipQuery}/json/` : 'https://ipapi.co/json/';
+
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error(`网络响应错误 (${response.status})`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.reason);
+
+            const flag = data.country_code ? `<span class="flag-icon flag-icon-${data.country_code.toLowerCase()}"></span>` : '';
+
+            renderCardContent(elementId, `
+                <strong>IP地址:</strong> ${data.ip}<br>
+                <strong>ASN:</strong> ${data.asn}<br>
+                <strong>ISP:</strong> ${data.org}<br>
+                <strong>国家/地区:</strong> ${data.country_name} ${flag}<br>
+                <strong>城市:</strong> ${data.city}, ${data.region}
+            `);
+        } catch (error) { renderCardContent(elementId, `获取连接信息失败: ${error.message}`, true); }
+    }
+    </script>
+</body>
 </html>

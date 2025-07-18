@@ -8,6 +8,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fenthope/reco v0.0.3 h1:RmnQ0D9a8PWtwOODawitTe4BztTnS9wYwrDbipISNq4=
 github.com/fenthope/reco v0.0.3/go.mod h1:mDkGLHte5udWTIcjQTxrABRcf56SSdxBOCLgrRDwI/Y=
+github.com/fenthope/record v0.0.3 h1:v5urgs5LAkLMlljAT/MjW8fWuRHXPnAraTem5ui7rm4=
+github.com/fenthope/record v0.0.3/go.mod h1:KFEkSc4TDZ3QIhP/wglD32uYVA6X1OUcripiao1DEE4=
 github.com/go-json-experiment/json v0.0.0-20250714165856-be8212f5270d h1:+d6m5Bjvv0/RJct1VcOw2P5bvBOGjENmxORJYnSYDow=
 github.com/go-json-experiment/json v0.0.0-20250714165856-be8212f5270d/go.mod h1:TiCD2a1pcmjd7YnhGH0f/zKNcCD06B029pHhzV23c2M=
 github.com/infinite-iroha/touka v0.3.1 h1:djR9hg5MbVpT1dIz2GWo4MZ/kx3l6bJ4nrpzpvdi3uk=

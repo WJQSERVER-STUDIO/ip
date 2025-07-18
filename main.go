@@ -14,6 +14,7 @@ import (
 	"ip/db"
 
 	"github.com/fenthope/reco"
+	"github.com/fenthope/record"
 	"github.com/infinite-iroha/touka"
 )
 
@@ -86,6 +87,8 @@ func main() {
 	updateDB(cfg)
 	setupDB(cfg)
 	router.SetLogger(logger)
+	router.Use(record.Middleware())
+
 	pFS, err := fs.Sub(pagesFS, "pages")
 	if err != nil {
 		logger.Errorf("Failed to load embedded pages: %v\n", err)

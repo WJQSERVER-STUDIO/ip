@@ -7,7 +7,7 @@ require (
 	github.com/fenthope/reco v0.0.3
 	github.com/fenthope/record v0.0.3
 	github.com/infinite-iroha/touka v0.3.1
-	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.8
+	github.com/oschwald/maxminddb-golang/v2 v2.0.0-beta.10
 )
 
 require (
@@ -16,5 +16,5 @@ require (
 	github.com/go-json-experiment/json v0.0.0-20250714165856-be8212f5270d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/net v0.42.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
 )

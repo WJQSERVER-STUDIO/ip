@@ -3,7 +3,7 @@ module ip
 go 1.24.5
 
 require (
-	github.com/BurntSushi/toml v1.5.0
+	github.com/BurntSushi/toml v1.6.0
 	github.com/fenthope/reco v0.0.3
 	github.com/fenthope/record v0.0.3
 	github.com/infinite-iroha/touka v0.3.1
